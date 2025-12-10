@@ -13,7 +13,6 @@
       --text:#f5f5f5;
       --muted:#9a9ca5;
       --card:#11131a;
-      --danger:#ff6363;
       --radius:18px;
       --shadow-strong:0 28px 60px rgba(0,0,0,0.75);
       --shadow-soft:0 16px 40px rgba(0,0,0,0.55);
@@ -76,7 +75,7 @@
     .logo-mark{
       width:32px;height:32px;
       border-radius:12px;
-      background:radial-gradient(circle at 20% 0,#fff, #f4c842 40%, #7a5b17 100%);
+      background:radial-gradient(circle at 20% 0,#fff,#f4c842 40%,#7a5b17 100%);
       display:flex;align-items:center;justify-content:center;
       box-shadow:0 0 20px rgba(244,200,66,0.7);
       transform-style:preserve-3d;
@@ -156,7 +155,6 @@
     }
 
     main{padding-top:86px;}
-
     section{
       min-height:80vh;
       padding:80px 7vw;
@@ -244,7 +242,7 @@
     .hero-sphere{
       position:absolute;inset:10%;
       border-radius:50%;
-      background:radial-gradient(circle at 20% 10%,#fff, #ffe8a0 25%, #f4c842 45%, #4c3b0e 100%);
+      background:radial-gradient(circle at 20% 10%,#fff,#ffe8a0 25%,#f4c842 45%,#4c3b0e 100%);
       box-shadow:
         0 0 40px rgba(255,255,255,0.5),
         0 0 120px rgba(244,200,66,0.8),
@@ -541,10 +539,7 @@
 
     @media (max-width:960px){
       header{padding:12px 5vw;}
-      .hero{
-        grid-template-columns:1fr;
-        gap:40px;
-      }
+      .hero{grid-template-columns:1fr;gap:40px;}
       .hero-copy{text-align:center;}
       .hero-sub,.hero-metrics{margin-inline:auto;}
       .hero-actions{justify-content:center;}
@@ -577,20 +572,20 @@
     <a href="#projects" class="nav-link">Projects</a>
     <a href="#contact" class="nav-link">Contact</a>
   </nav>
-  <button class="btn-primary" onclick="window.open('Hrushi-Resume.pdf','_blank')">
+  <button class="btn-primary" onclick="alert('Link your resume PDF here.')">
     Download Resume
   </button>
 </header>
 
 <main>
   <!-- HERO -->
-  <section id="hero">
-    <div class="hero fade-up">
+  <section id="hero" class="fade-up">
+    <div class="hero">
       <div class="hero-copy">
         <h1>Hrushikesh <span>Singh</span></h1>
         <p class="hero-sub">
-          Senior Business & Data Analyst specializing in BI platforms, data governance,
-          and machine learning to reduce risk, accelerate decisions, and keep enterprises audit‑ready.
+          Senior Business & Data Analyst specializing in BI platforms, data governance
+          and machine learning to reduce risk, accelerate decisions and keep enterprises audit‑ready.
         </p>
         <div class="hero-metrics">
           <div class="metric-pill"><strong>5+ yrs</strong><span>Analytics & BI</span></div>
@@ -623,21 +618,19 @@
     <div class="section-label">Profile</div>
     <h2 class="section-title">Transforming raw data into reliable decisions</h2>
     <p class="section-sub">
-      Blending business analysis, engineering‑grade data pipelines, and machine learning,
-      Hrushikesh builds analytics that executives trust for high‑stakes decisions in healthcare,
-      fintech, and large‑scale operations.
+      Blending business analysis, engineering‑grade data pipelines and machine learning,
+      Hrushikesh builds analytics that executives trust for high‑stakes decisions.
     </p>
     <div class="grid-advantages">
       <div class="adv-card">
         <div class="adv-icon">∞</div>
         <div class="adv-title">Enterprise analytics</div>
-        Designed Power BI and Tableau ecosystems for 200+ users with governed semantic models
-        and role‑based access.
+        Designed BI ecosystems for 200+ users with governed semantic models and role‑based access.
       </div>
       <div class="adv-card">
         <div class="adv-icon">✓</div>
         <div class="adv-title">Governance first</div>
-        Implemented lineage, data quality rules, and audit trails that pass SOX and HIPAA reviews.
+        Implemented lineage, data‑quality rules and audit trails that satisfy SOX and HIPAA.
       </div>
       <div class="adv-card">
         <div class="adv-icon">⚡</div>
@@ -647,7 +640,7 @@
       <div class="adv-card">
         <div class="adv-icon">AI</div>
         <div class="adv-title">Applied ML</div>
-        Built risk and prediction models using Python, scikit‑learn, and XGBoost for real outcomes.
+        Built risk and prediction models using Python, scikit‑learn and XGBoost.
       </div>
     </div>
   </section>
@@ -658,7 +651,6 @@
     <h2 class="section-title">From messy data to measurable outcomes</h2>
     <p class="section-sub">
       A clear, repeatable framework keeps projects predictable while leaving room for experimentation.
-      Each phase is backed by strong communication and tight feedback loops.
     </p>
     <div class="steps">
       <div class="step-card">
@@ -666,7 +658,7 @@
           <div class="step-index">01 — Discover</div>
           <div class="step-title">Context & constraints</div>
           <p class="step-body">
-            Clarify business goals, KPIs, data sources, and compliance needs to avoid surprises later.
+            Clarify goals, KPIs, data sources and compliance needs to avoid surprises later.
           </p>
         </div>
       </div>
@@ -675,7 +667,7 @@
           <div class="step-index">02 — Design</div>
           <div class="step-title">Architecture & metrics</div>
           <p class="step-body">
-            Map source‑to‑dashboard flows, define contracts, SLAs, and the metrics catalogue.
+            Map source‑to‑dashboard flows and define contracts, SLAs and metric definitions.
           </p>
         </div>
       </div>
@@ -684,7 +676,7 @@
           <div class="step-index">03 — Build</div>
           <div class="step-title">Pipelines & models</div>
           <p class="step-body">
-            Implement robust ETL/ELT, analytics models, and visual layers using Python, SQL, and BI tools.
+            Implement ETL/ELT, analytics models and visual layers with Python, SQL and BI tools.
           </p>
         </div>
       </div>
@@ -693,19 +685,19 @@
           <div class="step-index">04 — Scale</div>
           <div class="step-title">Ops & hand‑off</div>
           <p class="step-body">
-            Add monitoring, runbooks, and training so teams can own the solution with confidence.
+            Add monitoring, runbooks and training so teams can own the solution confidently.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROJECTS / PLANS -->
+  <!-- PROJECTS -->
   <section id="projects" class="angled fade-up">
     <div class="section-label">Selected work</div>
     <h2 class="section-title">Analytics and ML in production</h2>
     <p class="section-sub">
-      A few examples of how analytics, engineering, and governance combine to unlock real business value.
+      A few examples of how analytics, engineering and governance combine to unlock real business value.
     </p>
 
     <div class="plans">
@@ -715,13 +707,13 @@
           <span class="plan-tag">Python · XGBoost</span>
         </div>
         <div class="plan-meta">
-          Deployed a model on 100K+ clinical records to flag high‑risk patients and guide intervention.
+          Risk model on clinical records to flag high‑risk patients and guide intervention.
         </div>
         <div class="plan-metric"><strong>85% AUC‑PR</strong> on held‑out data with calibrated thresholds.</div>
         <ul class="plan-list">
-          <li>End‑to‑end pipeline from SQL warehouse to Python scoring.</li>
+          <li>Pipeline from SQL warehouse to Python scoring.</li>
           <li>Encrypted, role‑based access to comply with HIPAA.</li>
-          <li>Dashboards for clinicians to track impact over time.</li>
+          <li>Dashboards for clinicians to track impact.</li>
         </ul>
         <div class="plan-cta">
           <button class="btn-ghost">View notebook</button>
@@ -735,15 +727,15 @@
           <span class="plan-tag">Analytics</span>
         </div>
         <div class="plan-meta">
-          County‑level market analysis to prioritize where to launch new EV offerings across the US.
+          County‑level market analysis to prioritize where to launch new EV offerings.
         </div>
         <div class="plan-metric">
-          <strong>35% premium</strong> demand identified in tier‑1 markets and documented in a board‑ready deck.
+          <strong>35% premium</strong> demand identified in tier‑1 markets for expansion.
         </div>
         <ul class="plan-list">
-          <li>Blended demographic, infrastructure, and pricing data.</li>
-          <li>Scenario modeling for aggressive vs. conservative rollouts.</li>
-          <li>Executive dashboards with clear drill‑downs.</li>
+          <li>Blended demographic, infrastructure and pricing data.</li>
+          <li>Scenario modeling for multiple rollout options.</li>
+          <li>Executive dashboards with drill‑downs.</li>
         </ul>
         <div class="plan-cta">
           <button class="btn-ghost">View dashboard</button>
@@ -757,14 +749,14 @@
           <span class="plan-tag">Time‑series</span>
         </div>
         <div class="plan-meta">
-          Time‑series modeling on sensor data to predict failures before they create downtime.
+          Time‑series modeling on sensor data to predict failures before downtime.
         </div>
         <div class="plan-metric">
-          <strong>92% precision</strong> on 10M+ readings, enabling confident actions from operations.
+          <strong>92% precision</strong> on millions of readings, enabling proactive actions.
         </div>
         <ul class="plan-list">
           <li>Streaming ingestion and feature engineering in Python.</li>
-          <li>Model card, drift monitoring, and escalation runbook.</li>
+          <li>Model monitoring and escalation runbook.</li>
           <li>Estimated <strong>$500K+</strong> annual savings from reduced outages.</li>
         </ul>
         <div class="plan-cta">
@@ -780,12 +772,11 @@
     <div class="section-label">Contact</div>
     <h2 class="section-title">Let’s build your next analytics win</h2>
     <p class="section-sub">
-      Share a bit about your stack and your challenge. You will receive a thoughtful response
-      with next steps and potential solution paths.
+      Share a bit about your stack and your challenge. You will receive a thoughtful response with next steps.
     </p>
 
     <div class="contact-wrapper">
-      <form onsubmit="handleSubmit(event)">
+      <form id="contact-form">
         <div>
           <label>Full name
             <input type="text" id="name" required />
@@ -828,8 +819,7 @@
           </div>
         </div>
         <p>
-          Comfortable across HTML, CSS, JavaScript, Python, SQL, Power BI, Tableau, Azure, AWS, and modern
-          data engineering stacks.
+          Comfortable across HTML, CSS, JavaScript, Python, SQL, Power BI, Tableau, Azure, AWS and modern data engineering stacks.
         </p>
       </div>
     </div>
@@ -837,16 +827,16 @@
 </main>
 
 <footer>
-  <span>© 2025 Hrushikesh Singh · Built with HTML, CSS, and JavaScript</span>
+  <span>© 2025 Hrushikesh Singh · Built with HTML, CSS and JavaScript</span>
   <span>Designed for a dark, 3D cinematic feel.</span>
 </footer>
 
 <script>
-  // Smooth nav highlight
+  // Nav highlight on scroll
   const sections = document.querySelectorAll("section");
   const navLinks = document.querySelectorAll(".nav-link");
 
-  const observer = new IntersectionObserver(
+  const sectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -861,9 +851,9 @@
     },
     { threshold: 0.4 }
   );
-  sections.forEach((sec) => observer.observe(sec));
+  sections.forEach((sec) => sectionObserver.observe(sec));
 
-  // Fade-up on scroll
+  // Fade-up animation
   const fades = document.querySelectorAll(".fade-up");
   const fadeObserver = new IntersectionObserver(
     (entries) => {
@@ -891,13 +881,15 @@
       `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   });
 
-  // Fake form handler (front‑end only)
-  function handleSubmit(e){
+  // Simple front-end form handler
+  document.getElementById("contact-form").addEventListener("submit", function(e){
     e.preventDefault();
-    const name = document.getElementById("name").value.trim();
+    const name = document.getElementById("name").value.trim() || "there";
     const status = document.getElementById("form-status");
-    status.textContent = `Thank you, ${name || "there"} — your message has been captured locally (wire a Python backend to send it).`;
-  }
+    status.textContent =
+      `Thank you, ${name} — your message is captured on the page. Connect a Python backend to send it to email or a database.`;
+    this.reset();
+  });
 </script>
 </body>
 </html>
