@@ -440,14 +440,28 @@
     </div>
   </div>
 
-  <script>
-    // Check if memory is password protected
-    const isPasswordProtected = true;
-    const correctPassword = "memory2025"; // Demo password
+  <!-- Supabase client (UMD) and config -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0/dist/umd/supabase.min.js"></script>
+  <script src="/supabase-config.js"></script>
 
-    function checkPassword() {
+  <script>
+    // Initialize Supabase and fetch memory record
+    let supabaseClient = null;
+    function ensureSupabase() {
+      if (!supabaseClient && typeof supabase !== 'undefined' && typeof SUPABASE_URL !== 'undefined') {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    }
+
+    // Check if memory is password protected (will be determined from DB)
+    let isPasswordProtected = false;
+    let correctPassword = null;
+
+    async function checkPassword() {
       const input = document.getElementById("passwordInput");
       const password = input.value;
+
+      if (!isPasswordProtected) return;
 
       if (password === correctPassword) {
         document.getElementById("passwordPrompt").style.display = "none";
@@ -495,12 +509,61 @@
       link.click();
     }
 
-    // Auto-show content if not password protected
-    window.addEventListener("load", () => {
-      if (!isPasswordProtected) {
+    // Fetch memory by id from query string
+    async function fetchMemory() {
+      ensureSupabase();
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id || !supabaseClient) {
+        // no id or supabase, show demo content
         document.getElementById("passwordPrompt").style.display = "none";
         document.getElementById("videoContent").style.display = "block";
+        return;
       }
+
+      try {
+        const { data, error } = await supabaseClient.from('memories').select('*').eq('id', id).limit(1).single();
+        if (error) throw error;
+
+        // if we have a record, use its data
+        if (data) {
+          document.querySelector('.memory-title').textContent = data.title || 'Untitled memory';
+          document.querySelector('.memory-description').textContent = data.description || '';
+          document.querySelector('.metadata-value').textContent = data.created_by || 'Unknown';
+
+          isPasswordProtected = data.visibility === 'password' && data.password;
+          correctPassword = data.password || null;
+
+          // build public URL from storage path if needed
+          let videoUrl = data.video_url;
+          if (!videoUrl && data.video_path) {
+            const { data: publicData } = supabaseClient.storage.from('memories').getPublicUrl(data.video_path);
+            videoUrl = publicData?.publicUrl || null;
+          }
+
+          if (!isPasswordProtected) {
+            // show content immediately
+            if (videoUrl) {
+              document.getElementById('videoPlayer').querySelector('source').src = videoUrl;
+              document.getElementById('videoPlayer').load();
+            }
+            document.getElementById('passwordPrompt').style.display = 'none';
+            document.getElementById('videoContent').style.display = 'block';
+          } else {
+            document.getElementById('passwordPrompt').style.display = 'block';
+            document.getElementById('videoContent').style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.error('fetch memory error', err);
+        document.getElementById('passwordPrompt').style.display = 'none';
+        document.getElementById('videoContent').style.display = 'block';
+      }
+    }
+
+    window.addEventListener('load', () => {
+      fetchMemory();
     });
 
     // Update video time for demo

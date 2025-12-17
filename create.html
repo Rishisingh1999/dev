@@ -433,7 +433,20 @@
     </form>
   </div>
 
+  <!-- Supabase client (UMD) and config -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.26.0/dist/umd/supabase.min.js"></script>
+  <script src="/supabase-config.js"></script>
+
   <script>
+    // Initialize Supabase (injected below via CDN + config)
+    let supabaseClient = null;
+
+    function ensureSupabase() {
+      if (!supabaseClient && typeof supabase !== 'undefined' && typeof SUPABASE_URL !== 'undefined') {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    }
+
     const form = document.getElementById('memoryForm');
     const videoInput = document.getElementById('videoFile');
     const filePreview = document.getElementById('filePreview');
@@ -464,36 +477,102 @@
       });
     });
 
-    // Form submission
+    // Form submission — uploads file to Supabase Storage and creates a DB record
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      ensureSupabase();
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        const currentProgress = parseInt(progressFill.style.width) || 0;
-        if (currentProgress < 90) {
-          const newProgress = currentProgress + Math.random() * 20;
-          progressFill.style.width = Math.min(newProgress, 90) + '%';
-          progressText.textContent = Math.floor(Math.min(newProgress, 90)) + '%';
-        }
-      }, 300);
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const category = document.getElementById('category').value;
+      const date = document.getElementById('date').value;
+      const visibility = document.querySelector('input[name="visibility"]:checked').value;
+      const password = document.getElementById('password')?.value || null;
+      const file = videoInput.files[0];
 
-      // Simulate API call
-      setTimeout(() => {
-        clearInterval(progressInterval);
+      if (!file) {
+        alert('Please select a video file.');
+        return;
+      }
+
+      if (!supabaseClient) {
+        // If Supabase not available, fallback to demo behaviour
+        alert('Supabase client not initialized — using demo flow.');
+        // maintain previous demo behavior
+        progressFill.style.width = '100%';
+        progressText.textContent = '100%';
+        successMessage.classList.add('visible');
+        setTimeout(() => successMessage.classList.remove('visible'), 5000);
+        form.reset();
+        filePreview.classList.remove('visible');
+        return;
+      }
+
+      // show initial progress
+      progressFill.style.width = '6%';
+      progressText.textContent = '6%';
+
+      try {
+        // create a unique path
+        const filePath = `memories/${Date.now()}_${file.name}`;
+
+        // upload to Supabase Storage (bucket: memories)
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+          .from('memories')
+          .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) throw uploadError;
+
+        progressFill.style.width = '60%';
+        progressText.textContent = '60%';
+
+        // get public URL
+        const { data: publicData } = supabaseClient.storage.from('memories').getPublicUrl(filePath);
+        const publicUrl = publicData?.publicUrl || null;
+
+        // insert record in 'memories' table
+        const payload = {
+          title,
+          description,
+          category,
+          date,
+          visibility,
+          password,
+          video_path: filePath,
+          video_url: publicUrl,
+        };
+
+        const { data: insertData, error: insertError } = await supabaseClient.from('memories').insert([payload]).select();
+        if (insertError) throw insertError;
+
         progressFill.style.width = '100%';
         progressText.textContent = '100%';
 
-        // Show success
         successMessage.classList.add('visible');
         form.reset();
         filePreview.classList.remove('visible');
 
-        // Hide success after 5 seconds
+        // show link to memory
+        const created = Array.isArray(insertData) ? insertData[0] : insertData;
+        if (created && created.id) {
+          const link = `${location.origin}${location.pathname.replace(/create\.html$/, '')}memory.html?id=${created.id}`;
+          const showLink = document.createElement('div');
+          showLink.style.marginTop = '12px';
+          showLink.style.color = 'var(--muted)';
+          showLink.innerHTML = `Memory created — <a href="${link}" style="color:var(--accent);">Open memory</a>`;
+          successMessage.appendChild(showLink);
+        }
+
+        // Hide success after 8 seconds
         setTimeout(() => {
           successMessage.classList.remove('visible');
-        }, 5000);
-      }, 2000);
+          if (successMessage.lastChild && successMessage.lastChild.tagName === 'DIV') successMessage.removeChild(successMessage.lastChild);
+        }, 8000);
+
+      } catch (err) {
+        console.error('Upload error', err);
+        alert('Error creating memory: ' + (err.message || JSON.stringify(err)));
+      }
     });
   </script>
 </body>
