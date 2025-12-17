@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Memory - MemoryFrame</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050611;
+      --bg-soft: #0b0c1c;
+      --accent: #7f5dff;
+      --accent-soft: rgba(127, 93, 255, 0.15);
+      --text: #f5f5ff;
+      --muted: #9ca3c7;
+      --danger: #ff4b81;
+      --success: #22c55e;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1b1640 0, #050611 55%, #020208 100%);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-bottom: 24px;
+      transition: color 0.2s ease;
+    }
+
+    .back-nav:hover {
+      color: var(--text);
+    }
+
+    .video-container {
+      background: radial-gradient(circle at top, rgba(125, 211, 252, 0.15), transparent 55%),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(5, 6, 17, 1));
+      border-radius: 32px;
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .video-player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 24px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7f5dff, #ff4b81);
+      color: white;
+      box-shadow: 0 8px 20px rgba(127, 93, 255, 0.6);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(127, 93, 255, 0.8);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 255, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(30, 41, 79, 0.9);
+      color: var(--text);
+    }
+
+    .metadata {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(5, 6, 17, 1));
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .metadata-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metadata-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metadata-value {
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .memory-title {
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .memory-description {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(148, 163, 255, 0.25);
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .related-memories {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(5, 6, 17, 1));
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .related-title {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .related-item {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .related-item:hover {
+      background: rgba(30, 41, 79, 0.9);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .related-icon {
+      font-size: 24px;
+    }
+
+    .related-name {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .password-prompt {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(5, 6, 17, 0.9));
+      border: 1px solid rgba(148, 163, 255, 0.25);
+      border-radius: 32px;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .password-prompt h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .password-prompt p {
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .password-input-group {
+      display: flex;
+      gap: 12px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    input[type="password"] {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.45);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(127, 93, 255, 0.1);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.17);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      .metadata-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .memory-title {
+        font-size: 22px;
+      }
+
+      .controls {
+        flex-direction: column-reverse;
+      }
+
+      .control-buttons {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-nav">← Back to home</a>
+
+    <!-- Password Prompt (initially shown) -->
+    <div id="passwordPrompt" class="password-prompt">
+      <h2>This memory is protected</h2>
+      <p>Enter the password to view</p>
+      <div class="password-input-group">
+        <input type="password" id="passwordInput" placeholder="Enter password" />
+        <button class="btn btn-primary" onclick="checkPassword()">Unlock</button>
+      </div>
+    </div>
+
+    <!-- Video Player (hidden initially) -->
+    <div id="videoContent" style="display: none;">
+      <div class="video-container">
+        <div class="video-player">
+          <video id="videoPlayer" controls>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-library/sample/BigBuckBunny.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="controls">
+          <div class="control-buttons">
+            <button class="btn btn-secondary" id="shareBtn" onclick="shareMemory()">
+              <span>📤</span> Share
+            </button>
+            <button class="btn btn-secondary" id="downloadBtn" onclick="downloadVideo()">
+              <span>⬇️</span> Download
+            </button>
+          </div>
+          <div style="color: var(--muted); font-size: 13px;">
+            <span id="viewCount">1.2K</span> views
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div class="metadata">
+        <h1 class="memory-title">Summer Vacation 2025</h1>
+        <p class="memory-description">
+          A beautiful moment from our family trip to the beach. This video captures the joy and laughter we shared
+          together, making memories that will last a lifetime.
+        </p>
+
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="metadata-label">Created by</span>
+            <span class="metadata-value">John Doe</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Date</span>
+            <span class="metadata-value">June 15, 2025</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Category</span>
+            <span class="metadata-value">
+              <span class="badge">Vacation</span>
+            </span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Duration</span>
+            <span class="metadata-value">2:45</span>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-number">1.2K</div>
+            <div class="stat-label">Total Views</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">24</div>
+            <div class="stat-label">Shares</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">156</div>
+            <div class="stat-label">Interactions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Memories -->
+      <div class="related-memories">
+        <h3 class="related-title">More memories from this collection</h3>
+        <div class="related-grid">
+          <a href="#" class="related-item">
+            <span class="related-icon">🎉</span>
+            <span class="related-name">Birthday Party</span>
+          </a>
+          <a href="#" class="related-item">
+            <span class="related-icon">💍</span>
+            <span class="related-name">Anniversary</span>
+          </a>
+          <a href="#" class="related-item">
+            <span class="related-icon">🏖️</span>
+            <span class="related-name">Beach Day</span>
+          </a>
+          <a href="#" class="related-item">
+            <span class="related-icon">👨‍👩‍👧‍👦</span>
+            <span class="related-name">Family Dinner</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if memory is password protected
+    const isPasswordProtected = true;
+    const correctPassword = "memory2025"; // Demo password
+
+    function checkPassword() {
+      const input = document.getElementById("passwordInput");
+      const password = input.value;
+
+      if (password === correctPassword) {
+        document.getElementById("passwordPrompt").style.display = "none";
+        document.getElementById("videoContent").style.display = "block";
+        input.value = "";
+      } else {
+        input.style.borderColor = "var(--danger)";
+        setTimeout(() => {
+          input.style.borderColor = "rgba(148, 163, 255, 0.45)";
+        }, 1500);
+      }
+    }
+
+    // Allow Enter key to submit password
+    document.getElementById("passwordInput")?.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        checkPassword();
+      }
+    });
+
+    // Share memory
+    function shareMemory() {
+      const text = "Check out this memory on MemoryFrame!";
+      const url = window.location.href;
+
+      if (navigator.share) {
+        navigator.share({
+          title: "MemoryFrame",
+          text: text,
+          url: url,
+        });
+      } else {
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(url).then(() => {
+          alert("Link copied to clipboard!");
+        });
+      }
+    }
+
+    // Download video
+    function downloadVideo() {
+      const link = document.createElement("a");
+      link.href = "https://commondatastorage.googleapis.com/gtv-videos-library/sample/BigBuckBunny.mp4";
+      link.download = "memory-summer-vacation.mp4";
+      link.click();
+    }
+
+    // Auto-show content if not password protected
+    window.addEventListener("load", () => {
+      if (!isPasswordProtected) {
+        document.getElementById("passwordPrompt").style.display = "none";
+        document.getElementById("videoContent").style.display = "block";
+      }
+    });
+
+    // Update video time for demo
+    const videoPlayer = document.getElementById("videoPlayer");
+    if (videoPlayer) {
+      videoPlayer.addEventListener("loadedmetadata", () => {
+        const duration = videoPlayer.duration;
+        const minutes = Math.floor(duration / 60);
+        const seconds = Math.floor(duration % 60);
+        // You can update UI here if needed
+      });
+    }
+  </script>
+</body>
+</html>
