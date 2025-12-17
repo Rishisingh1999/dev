@@ -4,8 +4,162 @@
   <meta charset="UTF-8" />
   <title>MemoryFrame – Scan Your Memories</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/styles.css">
-</head>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+:root{
+  --bg-900:#04000a;
+  --bg-800:#0b0216;
+  --bg-700:#12021f;
+  --accent: #9b6bff;
+  --accent-2:#ff5fa3;
+  --accent-3:#7dd3fc;
+  --text:#f6f5ff;
+  --muted:#aeb6d9;
+  --glass: rgba(255,255,255,0.04);
+  --card: rgba(15,23,42,0.9);
+  --radius-lg:24px;
+  --radius-md:12px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0;}
+body{
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);
+  background: radial-gradient(circle at 20% 10%, rgba(42,17,58,0.65), transparent 30%), linear-gradient(180deg,var(--bg-900),var(--bg-800));
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+/* Fixed site header */
+.site-header{
+  position:fixed;left:0;right:0;top:0;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:60;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(6,4,18,0.28));backdrop-filter: blur(6px);border-bottom:1px solid rgba(148,163,255,0.06);
+}
+.site-logo{font-weight:800;color:var(--text);letter-spacing:-0.02em;font-size:18px;text-decoration:none}
+.site-nav{display:flex;gap:14px;align-items:center}
+.site-nav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:10px;transition:all .14s ease}
+.site-nav a:hover{color:var(--text);background:rgba(255,255,255,0.02)}
+
+/* page shell adjustments to avoid header overlap */
+main, .container, .shell{padding-top:92px}
+
+/* Buttons */
+.btn{border:0;cursor:pointer;border-radius:999px;padding:10px 16px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 12px 30px rgba(127,93,255,0.7)}
+.btn-ghost{background:transparent;border:1px solid rgba(148,163,255,0.08);color:var(--muted)}
+
+/* Cards and panels */
+.card, .right-panel, .video-container, .metadata, .feature-card{background:linear-gradient(145deg, rgba(15,23,42,0.9), rgba(5,6,17,0.98));border-radius:var(--radius-lg);border:1px solid rgba(148,163,255,0.06);padding:18px}
+
+/* Hero */
+.hero{position:relative;padding:48px 24px}
+.hero-title{font-size:48px;font-weight:800;margin:6px 0}
+.hero-sub{color:var(--muted);max-width:760px}
+.hero-giant{position:absolute;left:6%;top:24px;font-size:160px;font-weight:900;color:rgba(255,255,255,0.04);pointer-events:none;mix-blend-mode:overlay}
+.hero-bg-veil{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 20% 10%, rgba(155,107,255,0.06), transparent 10%), radial-gradient(ellipse at 80% 90%, rgba(255,95,163,0.04), transparent 10%);mix-blend-mode:screen}
+
+/* Forms / Upload */
+.file-upload{border-radius:var(--radius-md);border:2px dashed rgba(148,163,255,0.06);padding:18px;background:rgba(15,23,42,0.6);}
+input[type=text], textarea, select{background:rgba(10,10,18,0.6);border:1px solid rgba(148,163,255,0.06);color:var(--text);padding:10px;border-radius:12px;width:100%}
+
+/* Responsive tweaks */
+@media (max-width:900px){
+  .hero-title{font-size:32px}
+  .hero-giant{display:none}
+  main, .container, .shell{padding-top:80px}
+  .site-header{padding:0 14px}
+}
+
+/* Timeline rail refinement */
+.timeline-rail{position:fixed;left:18px;top:120px;display:flex;flex-direction:column;gap:18px;z-index:30}
+.rail-marker{display:inline-block;padding:6px 8px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.7);font-size:13px;text-decoration:none;border-radius:6px;backdrop-filter:blur(4px);transition:transform .18s ease,background .18s ease,color .18s ease}
+.rail-marker:hover{transform:translateX(6px);background:rgba(255,255,255,0.06);color:#fff}
+
+/* Utility */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1)}
+.reveal.revealed{opacity:1;transform:none}
+
+/* Footer */
+footer{padding:48px 24px;margin-top:40px;background:rgba(5,6,17,0.98);border-top:1px solid rgba(148,163,255,0.25);color:var(--muted);font-size:13px}
+
+/* Sections */
+.section{padding:60px 24px;text-align:center}
+.section-title{font-size:32px;letter-spacing:-0.04em;margin-bottom:12px;color:var(--text)}
+.section-subtitle{font-size:16px;color:var(--muted);max-width:600px;margin:0 auto 40px}
+
+/* Grid items */
+.features-grid,.pricing-grid,.faq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;max-width:1000px;margin:0 auto}
+
+.feature-card,.price-card,.faq-item{background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(5,6,17,1));border:1px solid rgba(148,163,255,0.45);border-radius:var(--radius-lg);padding:24px;text-align:left}
+.feature-card{text-align:center}
+
+.feature-icon{font-size:36px;margin-bottom:12px}
+.feature-name{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.price-title{font-size:20px;margin-bottom:8px;color:var(--text)}
+.price-amount{font-size:36px;font-weight:700;color:var(--accent);margin:16px 0}
+
+.faq-question{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px}
+.faq-answer{font-size:13px;color:var(--muted);line-height:1.6}
+
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(34,197,94,0.17);color:#bbf7d0;border:1px solid rgba(34,197,94,0.5);font-size:11px}
+
+.shell{max-width:1120px;width:100%;margin:0 auto;background:linear-gradient(145deg, rgba(255,255,255,0.01), rgba(6,4,18,0.85));border-radius:32px;box-shadow:0 30px 80px rgba(7,3,20,0.7);border:1px solid rgba(148,163,255,0.25);padding:24px 28px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:32px}
+
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr;padding:20px}
+  .pricing-grid{grid-template-columns:1fr}
+}
+
+.title{font-size:36px;line-height:1.15;letter-spacing:-0.04em;margin:18px 0 12px}
+.title span{background:linear-gradient(120deg, #a5b4ff, #e879f9, #7dd3fc);-webkit-background-clip:text;color:transparent}
+
+.subtitle{color:var(--muted);font-size:15px;line-height:1.5;max-width:420px;margin-bottom:24px}
+
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+
+.check{color:#4ade80;font-weight:700}
+.right-panel{position:relative;overflow:hidden}
+.right-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.right-title{font-size:14px;color:var(--muted)}
+.right-chip{font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(15,23,42,0.9);border:1px solid rgba(148,163,255,0.55);color:var(--muted)}
+
+.card{margin-top:8px;border-radius:var(--radius-md);background:radial-gradient(circle at top left, rgba(56,189,248,0.2), transparent 60%), rgba(15,23,42,0.98);border:1px solid rgba(107,114,255,0.55);padding:14px}
+
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:13px;color:var(--muted)}
+.chip-green{font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(34,197,94,0.17);color:#bbf7d0;border:1px solid rgba(34,197,94,0.5)}
+
+.timeline{display:grid;gap:8px;margin-top:8px}
+.timeline-item{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted)}
+.timeline-dot{margin-top:3px;width:8px;height:8px;border-radius:999px;background:radial-gradient(circle,#a5b4ff,#7c3aed);box-shadow:0 0 10px rgba(129,140,248,0.9)}
+
+.footer-note{margin-top:18px;font-size:11px;color:var(--muted);opacity:0.85}
+
+.footer-content{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;margin-bottom:32px}
+.footer-section h3{color:var(--text);margin-bottom:12px;font-size:14px}
+.footer-section a{display:block;margin-bottom:8px;color:var(--muted);text-decoration:none;transition:color .2s ease}
+.footer-section a:hover{color:var(--text)}
+
+.footer-bottom{max-width:1120px;margin:0 auto;padding-top:32px;border-top:1px solid rgba(148,163,255,0.25);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+
+.social-links{display:flex;gap:16px}
+.social-links a{color:var(--muted);text-decoration:none;transition:color .2s ease}
+.social-links a:hover{color:var(--accent)}
+
+.pill{padding:10px 12px;border-radius:999px;background:rgba(15,23,42,0.9);border:1px solid rgba(100,116,255,0.45);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.pill-icon{width:18px;height:18px;border-radius:999px;background:radial-gradient(circle, rgba(129,140,248,1) 0, rgba(56,189,248,1) 45%, rgba(236,72,153,1) 100%);display:flex;align-items:center;justify-content:center;font-size:11px;color:#020617}
+
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+
+@media(max-width:900px){
+  .features{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pricing-grid{grid-template-columns:1fr}
+}
+
+.badge-dot{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#c4ff9d 0, #55ff6e 45%, #228b48 100%);box-shadow:0 0 12px rgba(123,255,147,0.8)}
+  </style>
 <body>
     <header class="site-header">
       <a class="site-logo" href="Index.html">MemoryFrame</a>
