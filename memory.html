@@ -550,8 +550,9 @@
         // if we have a record, use its data
         if (data) {
           document.querySelector('.memory-title').textContent = data.title || 'Untitled memory';
-          document.querySelector('.memory-description').textContent = data.description || '';
-          document.querySelector('.metadata-value').textContent = data.created_by || 'Unknown';
+          // description/created_by may not exist in the current table; leave defaults
+          // set video URL from data
+          let videoUrlFromDb = data.video_url || null;
 
           isPasswordProtected = data.visibility === 'password' && data.password;
           correctPassword = data.password || null;
@@ -565,8 +566,10 @@
 
           if (!isPasswordProtected) {
             // show content immediately
-            if (videoUrl) {
-              document.getElementById('videoPlayer').querySelector('source').src = videoUrl;
+            const finalUrl = videoUrl || videoUrlFromDb;
+            if (finalUrl) {
+              const src = document.getElementById('videoPlayer').querySelector('source');
+              src.src = finalUrl;
               document.getElementById('videoPlayer').load();
             }
             document.getElementById('passwordPrompt').style.display = 'none';
@@ -633,5 +636,6 @@
       });
     }
   </script>
+  <script src="/animations.js"></script>
 </body>
 </html>

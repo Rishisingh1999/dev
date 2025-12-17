@@ -78,6 +78,54 @@
       box-shadow: 0 0 12px rgba(123, 255, 147, 0.8);
     }
 
+    /* Reveal + parallax helpers */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.9,.2,1); }
+    .reveal.revealed { opacity: 1; transform: translateY(0); }
+    .hero { position: relative; overflow: hidden; padding: 48px 24px; }
+    .hero-title { font-size: 64px; line-height: 1; letter-spacing: -0.02em; margin: 12px 0; max-width: 920px; }
+    .hero-sub { color: var(--muted); font-size: 18px; max-width: 780px; }
+    .hero-cta { margin-top: 20px; display:flex; gap:12px; }
+    .floaty { will-change: transform; transition: transform 600ms ease; }
+    [data-parallax] { will-change: transform; }
+
+    /* light parallax background overlay */
+    .hero-bg-veil { position:absolute; inset:0; pointer-events:none; background: radial-gradient(ellipse at 20% 10%, rgba(155,107,255,0.06), transparent 10%), radial-gradient(ellipse at 80% 90%, rgba(255,95,163,0.04), transparent 10%); mix-blend-mode: screen; }
+    .hero-giant {
+      position: absolute;
+      left: 5%;
+      top: 30px;
+      font-size: 160px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.06);
+      pointer-events: none;
+      letter-spacing: -0.03em;
+      transform: translateY(-10px);
+      mix-blend-mode: overlay;
+      white-space: nowrap;
+    }
+    .timeline-rail {
+      position: fixed;
+      left: 28px;
+      top: 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 30;
+    }
+    .rail-marker {
+      display: inline-block;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.7);
+      font-size: 12px;
+      text-decoration: none;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      transition: transform .18s ease, background .18s ease, color .18s ease;
+    }
+    .rail-marker:hover { transform: translateX(6px); background: rgba(255,255,255,0.06); color: #fff; }
+    @media (max-width:900px) { .timeline-rail { display:none; } }
+
     .title {
       font-size: 36px;
       line-height: 1.15;
@@ -484,6 +532,11 @@
   </style>
 </head>
 <body>
+    <nav class="timeline-rail" aria-hidden="true">
+      <a href="#features" class="rail-marker">Features</a>
+      <a href="#pricing" class="rail-marker">Pricing</a>
+      <a href="#faq" class="rail-marker">FAQ</a>
+    </nav>
   <main class="shell">
     <section>
       <div class="badge">
@@ -607,6 +660,18 @@
       </div>
     </div>
   </section>
+
+  <!-- small page decoration / hero with parallax -->
+  <div class="hero reveal" data-parallax="0.06">
+    <div class="hero-bg-veil"></div>
+    <div class="hero-giant">ISTOKI</div>
+    <h2 class="hero-title" style="font-weight:800;">Turn printed moments into living memories</h2>
+    <p class="hero-sub">Print a QR, stick it near a photo, anyone scans and replays the moment instantly — no app required.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="create.html">Create a memory</a>
+      <a class="btn btn-ghost" href="memory.html">View memory</a>
+    </div>
+  </div>
 
   <!-- Pricing Section -->
   <section class="section">
@@ -747,5 +812,7 @@
       </div>
     </div>
   </footer>
+  <!-- include animations script -->
+  <script src="/animations.js"></script>
 </body>
 </html>

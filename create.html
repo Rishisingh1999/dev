@@ -403,6 +403,8 @@
             <div class="file-upload-label">Click to upload or drag and drop</div>
             <div class="file-upload-hint">MP4, WebM, MOV up to 2GB</div>
           </div>
+          <!-- make file upload reveal on scroll -->
+          <div class="reveal" style="height:0;width:0;overflow:hidden;visibility:hidden"></div>
           <input type="file" id="videoFile" name="videoFile" accept="video/*" required />
         </div>
         <div class="file-preview" id="filePreview"></div>
@@ -477,6 +479,7 @@
   <script src="/supabase-config.js"></script>
 
   <script>
+    // small reveal classes applied by animations.js
     // Initialize Supabase (injected below via CDN + config)
     let supabaseClient = null;
 
@@ -570,14 +573,9 @@
         const publicUrl = publicData?.publicUrl || null;
 
         // insert record in 'memories' table
+        // Insert minimal fields into the existing `memories` table (title, video_url)
         const payload = {
-          title,
-          description,
-          category,
-          date,
-          visibility,
-          password,
-          video_path: filePath,
+          title: title || file.name,
           video_url: publicUrl,
         };
 
@@ -668,5 +666,6 @@
       window.open(shutterUrl, '_blank');
     });
   </script>
+  <script src="/animations.js"></script>
 </body>
 </html>
