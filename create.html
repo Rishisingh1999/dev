@@ -330,6 +330,45 @@
         ✓ Memory created successfully! Share the link or print the QR code.
       </div>
 
+      <!-- Print options (hidden until memory created) -->
+      <div id="printOptions" style="display:none;margin-top:16px;">
+        <h3 style="margin-bottom:8px;color:var(--text);">Print & Order</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
+          <label style="font-size:13px;color:var(--muted);">Size</label>
+          <select id="printSize">
+            <option value="4x6" data-price="0.39">4 × 6</option>
+            <option value="5x7" data-price="0.59">5 × 7</option>
+            <option value="8x10" data-price="1.29">8 × 10</option>
+            <option value="11x14" data-price="3.99">11 × 14</option>
+          </select>
+
+          <label style="font-size:13px;color:var(--muted);">Finish</label>
+          <select id="printFinish">
+            <option value="glossy" data-mult="1">Glossy</option>
+            <option value="matte" data-mult="1.1">Matte (+10%)</option>
+            <option value="lustre" data-mult="1.25">Lustre (+25%)</option>
+          </select>
+
+          <label style="font-size:13px;color:var(--muted);">Quantity</label>
+          <input id="printQty" type="number" min="1" value="1" />
+
+          <label style="font-size:13px;color:var(--muted);">Frame</label>
+          <select id="printFrame">
+            <option value="none" data-add="0">None</option>
+            <option value="simple" data-add="4.99">Simple (+$4.99)</option>
+            <option value="premium" data-add="12.99">Premium (+$12.99)</option>
+          </select>
+        </div>
+
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="color:var(--muted);">Estimated price: <strong id="printPrice">$0.00</strong></div>
+          <div style="display:flex;gap:8px;">
+            <button id="previewPrintBtn" type="button" class="btn btn-ghost">Preview</button>
+            <button id="orderShutterBtn" type="button" class="btn btn-primary">Order via Shutterfly</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Progress Bar -->
       <div class="progress">
         <div class="progress-label">
@@ -561,6 +600,12 @@
           showLink.style.color = 'var(--muted)';
           showLink.innerHTML = `Memory created — <a href="${link}" style="color:var(--accent);">Open memory</a>`;
           successMessage.appendChild(showLink);
+
+          // show print options and attach the memory link for preview/order
+          const printOptions = document.getElementById('printOptions');
+          printOptions.style.display = 'block';
+          printOptions.dataset.memoryLink = link;
+          updatePrintPrice();
         }
 
         // Hide success after 8 seconds
@@ -573,6 +618,54 @@
         console.error('Upload error', err);
         alert('Error creating memory: ' + (err.message || JSON.stringify(err)));
       }
+    });
+
+    // Print options logic
+    function currency(n){return '$'+(n.toFixed(2));}
+    function updatePrintPrice(){
+      const sizeSelect = document.getElementById('printSize');
+      const finishSelect = document.getElementById('printFinish');
+      const qty = parseInt(document.getElementById('printQty').value||1,10);
+      const frame = parseFloat(document.getElementById('printFrame').selectedOptions[0].dataset.add||0);
+      const base = parseFloat(sizeSelect.selectedOptions[0].dataset.price||0.5);
+      const mult = parseFloat(finishSelect.selectedOptions[0].dataset.mult||1);
+      const price = ((base * mult) * qty) + frame;
+      document.getElementById('printPrice').textContent = currency(price);
+      return price;
+    }
+
+    document.getElementById('printSize').addEventListener('change', updatePrintPrice);
+    document.getElementById('printFinish').addEventListener('change', updatePrintPrice);
+    document.getElementById('printQty').addEventListener('input', updatePrintPrice);
+    document.getElementById('printFrame').addEventListener('change', updatePrintPrice);
+
+    document.getElementById('previewPrintBtn').addEventListener('click', ()=>{
+      const container = document.getElementById('printOptions');
+      const link = container.dataset.memoryLink || location.href;
+      const title = document.getElementById('title').value || 'Memory Print';
+      const desc = document.getElementById('description').value || '';
+      const price = document.getElementById('printPrice').textContent;
+
+      const w = window.open('', '_blank');
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Print Preview</title>
+        <style>body{font-family:system-ui,Arial;background:#050018;color:#fff;padding:24px} .card{background:#0b0216;border-radius:12px;padding:20px}</style></head><body>
+        <div class="card">
+        <h2>${title}</h2>
+        <p style="color:#bfc6e8">${desc}</p>
+        <p>Link: <a href="${link}" target="_blank">${link}</a></p>
+        <p>Estimated price: <strong>${price}</strong></p>
+        </div>
+        <script>window.print();</script>
+        </body></html>`;
+      w.document.write(html);
+      w.document.close();
+    });
+
+    // Order via Shutterfly opens provided Shutterfly prints page in a new tab
+    document.getElementById('orderShutterBtn').addEventListener('click', ()=>{
+      // Provided Shutterfly URL
+      const shutterUrl = 'https://www.shutterfly.com/prints/?CID=SEMSN.PRINTS.21700000001930203_71700000092421536_138088976074&gclid=49f92a702eb315f8f38a4332abbbf5f7&gclsrc=3p.ds&msclkid=49f92a702eb315f8f38a4332abbbf5f7';
+      window.open(shutterUrl, '_blank');
     });
   </script>
 </body>

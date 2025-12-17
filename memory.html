@@ -437,6 +437,27 @@
           </a>
         </div>
       </div>
+      
+      <!-- Print / Order section -->
+      <div style="margin-top:20px;">
+        <h3 style="margin-bottom:8px;color:var(--text);">Print & Order</h3>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <label style="font-size:13px;color:var(--muted);">Size</label>
+          <select id="memPrintSize">
+            <option value="4x6" data-price="0.39">4 × 6</option>
+            <option value="5x7" data-price="0.59">5 × 7</option>
+            <option value="8x10" data-price="1.29">8 × 10</option>
+          </select>
+
+          <label style="font-size:13px;color:var(--muted);">Qty</label>
+          <input id="memPrintQty" type="number" min="1" value="1" style="width:70px;" />
+
+          <div style="margin-left:auto;color:var(--muted);">Estimated: <strong id="memPrintPrice">$0.00</strong></div>
+
+          <button id="memPreviewBtn" class="btn btn-ghost" style="margin-left:8px;">Preview</button>
+          <button id="memOrderBtn" class="btn btn-primary">Order via Shutterfly</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -561,6 +582,41 @@
         document.getElementById('videoContent').style.display = 'block';
       }
     }
+
+    // Print/order handlers
+    function formatCurrency(n){return '$'+(n.toFixed(2));}
+    function updateMemPrint(){
+      const size = document.getElementById('memPrintSize').selectedOptions[0];
+      const base = parseFloat(size.dataset.price||0.5);
+      const qty = parseInt(document.getElementById('memPrintQty').value||1,10);
+      const price = base * qty;
+      const el = document.getElementById('memPrintPrice');
+      if (el) el.textContent = formatCurrency(price);
+    }
+
+    document.getElementById('memPrintSize').addEventListener('change', updateMemPrint);
+    document.getElementById('memPrintQty').addEventListener('input', updateMemPrint);
+
+    document.getElementById('memPreviewBtn').addEventListener('click', ()=>{
+      const title = document.querySelector('.memory-title').textContent;
+      const desc = document.querySelector('.memory-description').textContent;
+      const link = location.href;
+      const price = document.getElementById('memPrintPrice').textContent;
+      const w = window.open('','_blank');
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Print Preview</title>
+        <style>body{font-family:system-ui,Arial;background:#050018;color:#fff;padding:24px} .card{background:#0b0216;border-radius:12px;padding:20px}</style></head><body>
+        <div class="card"><h2>${title}</h2><p style="color:#bfc6e8">${desc}</p><p>Link: <a href="${link}">${link}</a></p><p>Estimated price: <strong>${price}</strong></p></div>
+        <script>window.print();</script></body></html>`;
+      w.document.write(html);w.document.close();
+    });
+
+    document.getElementById('memOrderBtn').addEventListener('click', ()=>{
+      const shutterUrl = 'https://www.shutterfly.com/prints/?CID=SEMSN.PRINTS.21700000001930203_71700000092421536_138088976074&gclid=49f92a702eb315f8f38a4332abbbf5f7&gclsrc=3p.ds&msclkid=49f92a702eb315f8f38a4332abbbf5f7';
+      window.open(shutterUrl,'_blank');
+    });
+
+    // run initial update for price
+    updateMemPrint();
 
     window.addEventListener('load', () => {
       fetchMemory();
